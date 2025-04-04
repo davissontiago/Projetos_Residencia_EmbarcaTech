@@ -10,12 +10,17 @@
 #include "example_http_client_util.h"
 
 // ======= CONFIGURAÇÕES ======= //
-#define HOST "192.168.0.58"  // Substitua pelo IP do servidor
+#define HOST "192.168.186.138"  // Substitua pelo IP do servidor
 #define PORT 5000
-#define INTERVALO_MS 3000     // Intervalo entre mensagens (3 segundos)
+#define INTERVALO_MS 1000    // Intervalo entre mensagens (3 segundos)
+#define button_A 5
 // ============================= //
 
 int main() {
+    gpio_init(button_A);
+    gpio_set_dir(button_A, GPIO_IN);
+    gpio_pull_up(button_A);
+
     // Inicializa hardware
     stdio_init_all();
     printf("\nIniciando cliente HTTP...\n");
@@ -41,9 +46,14 @@ int main() {
 
     // Loop principal
     while(1) {
-        // Cria mensagem dinâmica
-        sprintf(url, "/mensagem?msg=PicoW_%d_Temp=%.1fC", 
-                counter++, 25.0 + (counter % 10) * 0.5);  // Exemplo com valor simulado
+        if (gpio_get(button_A) == 0 )
+        {
+            sprintf(url, "/mensagem?msg=Button_on_%d", 
+                counter++);  
+        } else {
+            sprintf(url, "/mensagem?msg=Button_off_%d", 
+                counter++);  
+        }
 
         // Configura requisição
         EXAMPLE_HTTP_REQUEST_T req = {0};
